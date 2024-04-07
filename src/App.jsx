@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { TextField, RadioGroup, Radio, FormControlLabel, Button, Box } from "@mui/material";
+import {
+  TextField,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  Button,
+  Box,
+} from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
@@ -11,11 +18,21 @@ export default function App() {
   const [comentario, setComentario] = useState("");
 
   const formSchema = Yup.object().shape({
-    nombreMonitor: Yup.string().max(255, "Máximo 255 caracteres").required("Campo requerido"),
+    nombreMonitor: Yup.string()
+      .max(255, "Máximo 255 caracteres")
+      .required("Campo requerido"),
     accion: Yup.string().required("Campo requerido"),
     unidades: Yup.number().positive().integer().required(),
     comentario: Yup.string(),
   });
+  const [option, setOption] = useState("Salida");
+  const [fielDisabled, setFielDisabled] = useState(false);
+
+  const handleOptionChange = (event) => {
+    setOption(event.target.value);
+    //si el valor seleccionado es entrada, deshabilita los campos
+    setFielDisabled(event.target.value === "Entrada");
+  };
 
   const addRegistro = async (e) => {
     e.preventDefault();
@@ -37,7 +54,12 @@ export default function App() {
     <>
       <h1>Registro de actividades</h1>
       <Formik
-        initialValues={{ nombreMonitor: "", accion: "", unidades: "", comentario: "" }}
+        initialValues={{
+          nombreMonitor: "",
+          accion: "",
+          unidades: "",
+          comentario: "",
+        }}
         validationSchema={formSchema}
         onSubmit={(values) => console.log(values)}
       >
@@ -52,18 +74,23 @@ export default function App() {
             value={nombreMonitor}
             onChange={(e) => setNombreMonitor(e.target.value)}
           />
-          <RadioGroup>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            Value={option}
+            name="radio-buttons-group"
+            onChange={handleOptionChange}
+          >
             <FormControlLabel
               name="accion"
-              value="ingreso"
+              value="Entrada"
               control={<Radio />}
-              label="Ingreso"
-              checked={accion === "ingreso"}
+              label="Entrada"
+              checked={accion === "entrada"}
               onChange={(e) => setAccion(e.target.value)}
             />
             <FormControlLabel
               name="accion"
-              value="salida"
+              value="Salida"
               control={<Radio />}
               label="Salida"
               checked={accion === "salida"}
@@ -78,6 +105,7 @@ export default function App() {
             fullWidth
             value={unidades}
             onChange={(e) => setUnidades(parseInt(e.target.value))}
+            disabled={fielDisabled}
           />
           <TextField
             id="outlined-multiline-flexible"
@@ -88,6 +116,7 @@ export default function App() {
             fullWidth
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
+            disabled={fielDisabled}
           />
           <Box textAlign="center">
             <Button variant="contained" onClick={addRegistro}>
