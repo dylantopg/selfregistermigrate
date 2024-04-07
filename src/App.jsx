@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
-import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
+//import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
 
 export default function App() {
   const [nombreMonitor, setNombreMonitor] = useState("");
@@ -76,7 +76,7 @@ export default function App() {
           />
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
-            Value={option}
+            value={option}
             name="radio-buttons-group"
             onChange={handleOptionChange}
           >
@@ -85,7 +85,6 @@ export default function App() {
               value="Entrada"
               control={<Radio />}
               label="Entrada"
-              checked={accion === "entrada"}
               onChange={(e) => setAccion(e.target.value)}
             />
             <FormControlLabel
@@ -93,7 +92,6 @@ export default function App() {
               value="Salida"
               control={<Radio />}
               label="Salida"
-              checked={accion === "salida"}
               onChange={(e) => setAccion(e.target.value)}
             />
           </RadioGroup>
