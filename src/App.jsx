@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { useState } from "react";
 import {
   TextField,
   RadioGroup,
@@ -9,7 +10,7 @@ import {
 } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
-//import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
+import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
 
 export default function App() {
   const [nombreMonitor, setNombreMonitor] = useState("");
@@ -37,16 +38,24 @@ export default function App() {
   const addRegistro = async (e) => {
     e.preventDefault();
 
+    const timestamp = new Date();
+
+    const response = await fetch("https://api.ipify.org");
+    const ip = await response.text();
+
     try {
-      await db.collection("registros").add({
+      const docRef = await addDoc(collection(db, "registros"), {
         nombreMonitor,
         accion,
         unidades,
         comentario,
+        timestamp,
+        ip,
       });
-      console.log("Data added to Firestore");
-    } catch (error) {
-      console.error("Error adding data to Firestore:", error);
+      console.log("Document written with ID: ", docRef.id);
+      console.log(timestamp);
+    } catch (e) {
+      console.error("Error adding document: ", e);
     }
   };
 
@@ -65,6 +74,7 @@ export default function App() {
       >
         <Form>
           <TextField
+            required
             name="nombreMonior"
             label="Nombre Monitor"
             variant="outlined"
