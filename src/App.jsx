@@ -9,6 +9,7 @@ import {
 
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
+import {useState} from "react";
 
 export default function App() {
   const formSchema = Yup.object().shape({
@@ -19,6 +20,14 @@ export default function App() {
     unidades: Yup.number().positive().integer().required(),
     comentario: Yup.string(),
   });
+  const [option,setOption]= useState('Salida');
+  const [fielDisabled,setFielDisabled] = useState(false);
+
+  const handleOptionChange = (event) => {
+  setOption(event.target.value);
+  //si el valor seleccionado es entrada, deshabilita los campos
+  setFielDisabled(event.target.value === 'Entrada');
+  }
 
   return (
     <>
@@ -42,16 +51,21 @@ export default function App() {
             type="text"
             fullWidth
           />
-          <RadioGroup>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            Value={option}
+            name="radio-buttons-group"
+            onChange={handleOptionChange}
+          >
             <FormControlLabel
               name="accion"
-              value="ingreso"
+              value="Entrada"
               control={<Radio />}
-              label="Ingreso"
+              label="Entrada"
             />
             <FormControlLabel
               name="accion"
-              value="salida"
+              value="Salida"
               control={<Radio />}
               label="Salida"
             />
@@ -62,6 +76,8 @@ export default function App() {
             label="Unidades intervenidas"
             type="number"
             fullWidth
+            inputProps={{min: "0"}}
+            disabled={fielDisabled}
           />
           <TextField
             id="outlined-multiline-flexible"
@@ -70,6 +86,7 @@ export default function App() {
             minRows={4}
             maxRows={4}
             fullWidth
+            disabled={fielDisabled}
           />
           <Box textAlign="center">
             <Button
