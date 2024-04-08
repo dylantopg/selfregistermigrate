@@ -9,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import * as Yup from "yup";
-import { Formik, Form } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 import { db } from "./firebase"; // Assuming you have a Firebase configuration set up
 
 export default function App() {
@@ -22,8 +22,8 @@ export default function App() {
     nombreMonitor: Yup.string()
       .max(255, "Máximo 255 caracteres")
       .required("Campo requerido"),
-    accion: Yup.string().required("Campo requerido"),
-    unidades: Yup.number().positive().integer().required(),
+    accion: Yup.string(),
+    unidades: Yup.number().positive().integer(),
     comentario: Yup.string(),
   });
   const [option, setOption] = useState("Salida");
@@ -35,25 +35,18 @@ export default function App() {
     setFielDisabled(event.target.value === "Entrada");
   };
 
-  const addRegistro = async (e) => {
-    e.preventDefault();
-
-    const timestamp = new Date();
-
-    const response = await fetch("https://api.ipify.org");
-    const ip = await response.text();
-
+  const addRegistro = async (values) => {
     try {
+      const response = await fetch("https://api.ipify.org");
+      const ip = await response.text();
+
       const docRef = await addDoc(collection(db, "registros"), {
-        nombreMonitor,
-        accion,
-        unidades,
-        comentario,
-        timestamp,
+        ...values,
+        timestamp: new Date().toISOString(),
         ip,
       });
+
       console.log("Document written with ID: ", docRef.id);
-      console.log(timestamp);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -70,12 +63,12 @@ export default function App() {
           comentario: "",
         }}
         validationSchema={formSchema}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={addRegistro}
       >
         <Form>
           <TextField
             required
-            name="nombreMonior"
+            name="nombreMonitor"
             label="Nombre Monitor"
             variant="outlined"
             margin="normal"
@@ -83,6 +76,11 @@ export default function App() {
             fullWidth
             value={nombreMonitor}
             onChange={(e) => setNombreMonitor(e.target.value)}
+          />
+          <ErrorMessage
+            name="nombreMonitor"
+            component="div"
+            className="field-error text-danger"
           />
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
@@ -116,6 +114,7 @@ export default function App() {
             disabled={fielDisabled}
           />
           <TextField
+            name="comentario"
             id="outlined-multiline-flexible"
             label="Observaciones"
             multiline
@@ -125,6 +124,11 @@ export default function App() {
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
             disabled={fielDisabled}
+          />
+          <ErrorMessage
+            name="comentario"
+            component="div"
+            className="field-error text-danger"
           />
           <Box textAlign="center">
             <Button variant="contained" onClick={addRegistro}>
