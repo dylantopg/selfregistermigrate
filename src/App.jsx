@@ -7,6 +7,7 @@ import {
   Radio,
   FormControl,
   FormLabel,
+  Typography,
 } from "@mui/material";
 
 export default function App() {
@@ -44,9 +45,17 @@ export default function App() {
     setTipoRegistro(event.target.value);
   };
 
+  const addRegistro = async (e) => {
+    e.preventDefault();
+    const timestamp = new Date();
+  };
+
   return (
     <>
       <form onSubmit={handleSubmit}>
+        <Typography variant="h2" align="center">
+          Registro de asistencias
+        </Typography>
         <FormControl fullWidth>
           <TextField
             label="Nombre:"
